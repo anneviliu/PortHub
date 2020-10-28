@@ -1,11 +1,11 @@
 package database
 
 import (
+	"PortHub/forms"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"
-	"portScan_demo/forms"
 )
 
 var Db *gorm.DB

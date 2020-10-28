@@ -1,9 +1,9 @@
 package main
 
 import (
+	"PortHub/forms"
+	"PortHub/scanner"
 	"github.com/gin-gonic/gin"
-	"portScan_demo/forms"
-	"portScan_demo/scanner"
 	"sync"
 	"time"
 )
