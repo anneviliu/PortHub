@@ -5,6 +5,7 @@ import "github.com/jinzhu/gorm"
 type PortScanForm struct {
 	Ips   string `json:"ips"`
 	Ports string `json:"ports"`
+	Concurrent int `json:"speed"`
 }
 
 type Response struct {

@@ -3,24 +3,32 @@ package scanner
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"sync"
+	"time"
 )
 
-var Timeout = 5
 var Alive []string
 
-func StartScanTask(ip net.IP, port int, wg *sync.WaitGroup) {
-	//fmt.Println("Scan start")
+func StartScanTask(ip net.IP, port int, wg *sync.WaitGroup,ConLimit *chan int) {
 	defer wg.Done()
 	tcpAddr := net.TCPAddr{
 		IP:   ip,
 		Port: port,
 	}
-	//conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", tcpAddr.IP, tcpAddr.Port), time.Millisecond*time.Duration(Timeout))
-	conn, err := net.DialTCP("tcp", nil, &tcpAddr)
-	if err == nil {
-		fmt.Println(ip, port, "is alive", conn, err)
-		Alive = append(Alive, tcpAddr.IP.String()+string(tcpAddr.Port))
+	conn, _ := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", tcpAddr.IP, tcpAddr.Port), time.Millisecond*time.Duration(500))
+	//conn, _ := net.DialTCP("tcp", nil, &tcpAddr)
+	if conn != nil {
+		fmt.Println(ip, port, "is alive")
+		err := conn.Close()
+		if err != nil {
+			panic(err)
+		}
+
+		Alive = append(Alive, tcpAddr.IP.String()+":" +strconv.Itoa(tcpAddr.Port))
 	}
-	fmt.Println(err)
+	//fmt.Println(runtime.NumGoroutine())
+	//fmt.Println(err)
+	//conn.Close()
+	<- *ConLimit
 }

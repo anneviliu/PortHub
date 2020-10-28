@@ -17,5 +17,9 @@ func main() {
 	r.POST("/createPortScanTask", func(c *gin.Context) {
 		ScannerController(c)
 	})
+
+	r.GET("/getResult", func(c *gin.Context) {
+		Output(c)
+	})
 	r.Run()
 }
