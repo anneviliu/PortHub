@@ -11,6 +11,7 @@ import (
 	"sync"
 )
 
+
 func ScannerController(c *gin.Context) {
 	form := new(forms.PortScanForm)
 	err := c.BindJSON(form)
@@ -34,15 +35,18 @@ func ScannerController(c *gin.Context) {
 		for _, port := range ports {
 			ConLimit <- 1
 			go scanner.StartScanTask(ip, port, &wg,&ConLimit)
-			RetResult(c)
+			RetResult()
+		}
+		_, err := database.Redis.Do("SREM",ip,"running")
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 
 	wg.Wait()
 }
 
-func RetResult(c *gin.Context) {
-	//defer wg.Done()
+func RetResult() {
 	var infoArr []string
 	for _, v := range scanner.Alive {
 		infoArr = strings.Split(strings.Trim(v, ":"), ":")
@@ -50,8 +54,12 @@ func RetResult(c *gin.Context) {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		_, err = database.Redis.Do("SADD",infoArr[0],"running")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	//database.Redis.Close()
 }
 
 func GetResult(c *gin.Context) {
@@ -59,7 +67,6 @@ func GetResult(c *gin.Context) {
 	pool := NewPool()
 	conn := pool.Get()
 	defer conn.Close()
-
 
 	ips, err := redis.Strings(conn.Do("keys","*"))
 	if err != nil {
@@ -70,6 +77,14 @@ func GetResult(c *gin.Context) {
 		port,err := redis.Strings(conn.Do("SMEMBERS",ip))
 		if err!= nil {
 			log.Fatal(err)
+		}
+
+		// delete value "running"
+		for k,v := range port {
+			if v == "running" {
+				port = append(port[:k], port[k+1:]...)
+				break
+			}
 		}
 		data[ip] = port
 	}
