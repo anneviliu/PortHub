@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/gomodule/redigo/redis"
 	"github.com/malfunkt/iprange"
 	uuid "github.com/satori/go.uuid"
 
@@ -85,4 +86,17 @@ func Unique(arr []int) []int {
 		}
 	}
 	return newArr
+}
+
+func NewPoolFunc()(redis.Conn, error){
+	return redis.Dial("tcp", ":6379")
+}
+
+//生成一个连接池对象
+func NewPool()(* redis.Pool){
+	return &redis.Pool{
+		MaxIdle: 50,
+		Dial: NewPoolFunc,
+		Wait: true,
+	}
 }

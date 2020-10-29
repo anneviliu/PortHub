@@ -17,7 +17,6 @@ func StartScanTask(ip net.IP, port int, wg *sync.WaitGroup,ConLimit *chan int) {
 		Port: port,
 	}
 	conn, _ := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", tcpAddr.IP, tcpAddr.Port), time.Millisecond*time.Duration(500))
-	//conn, _ := net.DialTCP("tcp", nil, &tcpAddr)
 	if conn != nil {
 		fmt.Println(ip, port, "is alive")
 		err := conn.Close()
@@ -27,8 +26,6 @@ func StartScanTask(ip net.IP, port int, wg *sync.WaitGroup,ConLimit *chan int) {
 
 		Alive = append(Alive, tcpAddr.IP.String()+":" +strconv.Itoa(tcpAddr.Port))
 	}
-	//fmt.Println(runtime.NumGoroutine())
-	//fmt.Println(err)
-	//conn.Close()
+
 	<- *ConLimit
 }

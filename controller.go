@@ -19,8 +19,6 @@ func ScannerController(c *gin.Context) {
 		return
 	}
 
-	// 暂时先实现单ip多端口的扫描
-	// 从ip port表达式中解析出单个ip+port
 	ips, ports, err := ResolveIPPortFormat(form)
 	if err != nil {
 		c.JSON(400, forms.Response{StatusCode: 400, Messages: err.Error(), Data: nil})
@@ -29,7 +27,6 @@ func ScannerController(c *gin.Context) {
 	var wg sync.WaitGroup
 	c.JSON(200, forms.Response{StatusCode: 200, Messages: "", Data: map[string]interface{}{"taskId": CreateTaskID()}})
 
-	// Cool concurrent count
 	ConLimit := make(chan int, form.Concurrent)
 
 	wg.Add(len(ports)*len(ips) +1)
@@ -59,13 +56,18 @@ func RetResult(c *gin.Context) {
 
 func GetResult(c *gin.Context) {
 	data := make(map[string][]string)
-	ips, err := redis.Strings(database.Redis.Do("keys","*"))
+	pool := NewPool()
+	conn := pool.Get()
+	defer conn.Close()
+
+
+	ips, err := redis.Strings(conn.Do("keys","*"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _,ip := range ips {
-		port,err := redis.Strings(database.Redis.Do("SMEMBERS",ip))
+		port,err := redis.Strings(conn.Do("SMEMBERS",ip))
 		if err!= nil {
 			log.Fatal(err)
 		}

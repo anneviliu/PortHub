@@ -15,7 +15,7 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", gin.H{})
 	})
 	
-	r.POST("/createPortScanTask", func(c *gin.Context) {
+	r.POST("/api/createPortScanTask", func(c *gin.Context) {
 		ScannerController(c)
 	})
 	

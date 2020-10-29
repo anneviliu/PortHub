@@ -28,6 +28,7 @@
 
     </head>
     <body class="text-center">
+
         <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
             <header class="masthead mb-auto">
             </header>
@@ -37,11 +38,12 @@
                     <h3 class="masthead-brand">MicPortScanner</h3>
                     <a style="color: darkgray">A simple port scanner demo made with Golang.</a>
                 </div>
-
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control fc-clear" placeholder="ip:127.0.0.1 port:1-65535" aria-label="" aria-describedby="button-start">
-                    <div class="input-group-prepend">
-                        <button class="btn btn-warning" type="button" id="button-start">Start</button>
+                <div id="submit">
+                    <div class="input-group mb-3">
+                        <input type="text" v-model='taskdata' class="form-control fc-clear" placeholder="ip:127.0.0.1 port:1-65535" aria-label="" aria-describedby="button-start">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-warning" type="button" id="button-start" @keyup.enter="submitTask" @click="submitTask">Start</button>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -51,6 +53,10 @@
                     <p>A PortScanner Demo Created By <a href="https://annevi.cn">Annevi</a>.</p>
                 </div>
             </footer>
-        </div>
+    </div>
+
     </body>
+    <script src="/static/vue.js"></script>
+    <script src="/static/axios.min.js"></script>
+    <script src="/static/submit.js"></script>
 </html>

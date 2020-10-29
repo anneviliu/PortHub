@@ -13,10 +13,9 @@ new Vue({
             this.ips = t
             console.log(t)
         },
+
     },
     mounted () {
         this.getResult()
     }
-
-
 });
