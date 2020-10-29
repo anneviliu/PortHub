@@ -18,8 +18,8 @@ func main() {
 		ScannerController(c)
 	})
 
-	r.GET("/getResult", func(c *gin.Context) {
-		Output(c)
-	})
+	//r.GET("/getResult", func(c *gin.Context) {
+	//	Output(c)
+	//})
 	r.Run()
 }

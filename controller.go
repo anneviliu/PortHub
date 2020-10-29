@@ -6,6 +6,7 @@ import (
 	"PortHub/scanner"
 	"github.com/gin-gonic/gin"
 	"log"
+	"strings"
 	"sync"
 )
 
@@ -30,20 +31,27 @@ func ScannerController(c *gin.Context) {
 	// Cool concurrent count
 	ConLimit := make(chan int, form.Concurrent)
 
-	wg.Add(len(ports)*len(ips) +1 )
+	wg.Add(len(ports)*len(ips) +1)
 	for _, ip := range ips {
 		for _, port := range ports {
 			ConLimit <- 1
 			go scanner.StartScanTask(ip, port, &wg,&ConLimit)
+			RetResult(c)
 		}
 	}
+
 	wg.Wait()
 }
 
 func RetResult(c *gin.Context) {
-
-	_, err := database.Redis.Do("SADD",ip,port)
-	if err != nil {
-		log.Fatal(err)
+	//defer wg.Done()
+	var infoArr []string
+	for _, v := range scanner.Alive {
+		infoArr = strings.Split(strings.Trim(v, ":"), ":")
+		_, err := database.Redis.Do("SADD",infoArr[0],infoArr[1])
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+	//database.Redis.Close()
 }

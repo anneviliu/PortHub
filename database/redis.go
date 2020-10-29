@@ -14,4 +14,5 @@ func init() {
 	}
 
 	Redis = conn
+	//conn.Close()
 }
