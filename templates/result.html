@@ -32,18 +32,21 @@
         <header class="masthead mb-auto">
         </header>
         <div id="app">
-            <main role="main" class="inner cover">
+            <div class="container">
                 <h4 class="reslut-logo">Port scan result</h4>
-                <div class="input-group mb-3"  v-for="ip in ips">
-                    <div class="card text-white bg-success mb-3" style="max-width: 18rem;">
-                        <div class="card-header">47.99.241.73</div>
-                        <div class="card-body">
-                            <a href="#" class="badge badge-warning"></a>
+                <div class="row row-cols-3">
+                        <div class="col" v-for="(ports,ip) in ips">
+                            <div class="card text-white bg-success mb-3" style="max-width: 18rem;">
+                                <div class="card-header">{[ip]}</div>
+                                <div class="card-body">
+                                    <a href="#" class="ports badge badge-danger" v-for="port in ports">{[port]}</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
                 </div>
-            </main>
+            </div>
         </div>
+
 
 
         <footer class="mastfoot mt-auto">

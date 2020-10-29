@@ -103,8 +103,16 @@ body {
 
 .reslut-logo {
     text-align: center;
+    margin-bottom: 80px;
 }
 
+.ports {
+    margin-right: 10px;
+}
+
+.card-cus {
+    margin-bottom: 10px;
+}
 
 /*
  * Footer

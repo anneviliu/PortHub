@@ -73,5 +73,4 @@ func GetResult(c *gin.Context) {
 	}
 
 	c.JSON(200, forms.Response{StatusCode: 200, Messages: data, Data: map[string]interface{}{"taskId": CreateTaskID()}})
-
 }
