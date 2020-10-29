@@ -5,6 +5,7 @@ import (
 	"PortHub/forms"
 	"PortHub/scanner"
 	"github.com/gin-gonic/gin"
+	"github.com/gomodule/redigo/redis"
 	"log"
 	"strings"
 	"sync"
@@ -54,4 +55,23 @@ func RetResult(c *gin.Context) {
 		}
 	}
 	//database.Redis.Close()
+}
+
+func GetResult(c *gin.Context) {
+	data := make(map[string][]string)
+	ips, err := redis.Strings(database.Redis.Do("keys","*"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _,ip := range ips {
+		port,err := redis.Strings(database.Redis.Do("SMEMBERS",ip))
+		if err!= nil {
+			log.Fatal(err)
+		}
+		data[ip] = port
+	}
+
+	c.JSON(200, forms.Response{StatusCode: 200, Messages: data, Data: map[string]interface{}{"taskId": CreateTaskID()}})
+
 }

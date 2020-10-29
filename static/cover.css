@@ -47,7 +47,7 @@ body {
  * Header
  */
 .masthead {
-    margin-bottom: 2rem;
+    margin-bottom: 5rem;
 }
 
 .masthead-brand {
@@ -99,6 +99,10 @@ body {
 
 .advance {
     float: right;
+}
+
+.reslut-logo {
+    text-align: center;
 }
 
 

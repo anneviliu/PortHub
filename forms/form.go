@@ -10,9 +10,15 @@ type PortScanForm struct {
 
 type Response struct {
 	StatusCode int         `json:"statusCode" example:"200"`
-	Messages   string      `json:"messages" example:"错误信息"`
+	Messages   interface{}      `json:"messages" example:"错误信息"`
 	Data       interface{} `json:"data"`
 }
+
+//type Result struct {
+//	StatusCode int `json:"statusCode"`
+//	Result []string `json:"result"`
+//
+//}
 
 type ScannerDb struct {
 	gorm.Model
