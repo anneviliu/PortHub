@@ -9,8 +9,6 @@ new Vue({
     },
     methods: {
         buildJson(taskdata) {
-            // var dataArr = taskdata.split(" ")
-            // console.log(dataArr)
             var regexIP = "(?<=ip:).*?(?=port)"
             var regexPort = "(?<=port:).*"
             var ip = taskdata.match(regexIP)
@@ -22,7 +20,6 @@ new Vue({
 
        submitTask() {
           let data = this.buildJson(this.taskdata)
-           // let data = {};
            axios.post('/api/createPortScanTask', data)
                .then(function (response) {
                    console.log(response.data)
@@ -30,6 +27,7 @@ new Vue({
                .catch(function (error) {
                    console.log(error);
                });
+          location.href = "/result"
        }
     },
     mounted () {

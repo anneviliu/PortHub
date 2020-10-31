@@ -1,9 +1,9 @@
 package main
 
 import (
+	"PortHub/database"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"PortHub/database"
 )
 
 func main() {
@@ -27,4 +27,15 @@ func main() {
 		GetResult(c)
 	})
 	r.Run()
+
+	//var wg sync.WaitGroup
+	//s := make(chan os.Signal)
+	////wg.Add(1)
+	//go func() {
+	//	signal.Notify(s)
+	//	t:= <-s
+	//	fmt.Println(t)
+	//	//wg.Done()
+	//}()
+	//wg.Wait()
 }

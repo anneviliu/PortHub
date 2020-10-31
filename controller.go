@@ -9,6 +9,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 )
 
 
@@ -26,36 +27,41 @@ func ScannerController(c *gin.Context) {
 		return
 	}
 	var wg sync.WaitGroup
+	pool := database.NewPool()
+	conn := pool.Get()
+
 	c.JSON(200, forms.Response{StatusCode: 200, Messages: "", Data: map[string]interface{}{"taskId": CreateTaskID()}})
 
 	ConLimit := make(chan int, form.Concurrent)
 
 	wg.Add(len(ports)*len(ips) +1)
 	for _, ip := range ips {
+		_, err = conn.Do("SADD",ip,"running")
+		if err != nil {
+			log.Fatal(err)
+		}
 		for _, port := range ports {
 			ConLimit <- 1
 			go scanner.StartScanTask(ip, port, &wg,&ConLimit)
 			RetResult()
 		}
-		_, err := database.Redis.Do("SREM",ip,"running")
+		time.Sleep(2000)
+		_, err := conn.Do("SREM",ip,"running")
 		if err != nil {
 			log.Fatal(err)
 		}
+		time.Sleep(2000)
 	}
-
 	wg.Wait()
 }
 
 func RetResult() {
+	pool := database.NewPool()
+	conn := pool.Get()
 	var infoArr []string
 	for _, v := range scanner.Alive {
 		infoArr = strings.Split(strings.Trim(v, ":"), ":")
-		_, err := database.Redis.Do("SADD",infoArr[0],infoArr[1])
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		_, err = database.Redis.Do("SADD",infoArr[0],"running")
+		_, err := conn.Do("SADD",infoArr[0],infoArr[1])
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -63,9 +69,12 @@ func RetResult() {
 }
 
 func GetResult(c *gin.Context) {
-	data := make(map[string][]string)
-	pool := NewPool()
+	data := make(map[string]interface{})
+	status := make(map[string]bool)
+
+	pool := database.NewPool()
 	conn := pool.Get()
+
 	defer conn.Close()
 
 	ips, err := redis.Strings(conn.Do("keys","*"))
@@ -79,14 +88,17 @@ func GetResult(c *gin.Context) {
 			log.Fatal(err)
 		}
 
-		// delete value "running"
+		//delete value "running" and return
 		for k,v := range port {
 			if v == "running" {
+				status[ip] = true
 				port = append(port[:k], port[k+1:]...)
 				break
 			}
+			status[ip] = false
 		}
-		data[ip] = port
+		tmp := map[string]interface{}{"port":port,"status":status[ip]}
+		data[ip] = tmp
 	}
 
 	c.JSON(200, forms.Response{StatusCode: 200, Messages: data, Data: map[string]interface{}{"taskId": CreateTaskID()}})

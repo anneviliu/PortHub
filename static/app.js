@@ -4,18 +4,26 @@ new Vue({
 
     data() {
         return {
-            ips:[],
+            res:[],
         }
     },
     methods: {
         async getResult() {
-            var t = (await axios.get('/api/getResult')).data.messages;
-            this.ips = t
-            console.log(t)
-        },
+            var resp = (await axios.get('/api/getResult')).data;
 
+            for(let k in resp.messages) {
+                var portCount = resp.messages[k].port.length
+                if (portCount > 6) {
+                    resp.messages[k].port = resp.messages[k].port.slice(0,7)
+                }
+            }
+            this.res = resp
+        },
     },
     mounted () {
-        this.getResult()
+        this.getResult();
+        window.setInterval(() => {
+            setTimeout(this.getResult(),0)
+        }, 1000)
     }
 });
