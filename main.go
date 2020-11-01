@@ -26,6 +26,11 @@ func main() {
 	r.GET("/api/getResult", func(c *gin.Context) {
 		GetResult(c)
 	})
+
+	r.GET("/api/getResultByIP", func(c *gin.Context) {
+		ip := c.Query("ip")
+		GetSingleIpRes(c,ip)
+	})
 	r.Run()
 
 	//var wg sync.WaitGroup

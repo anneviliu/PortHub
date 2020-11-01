@@ -32,14 +32,22 @@ func ScannerController(c *gin.Context) {
 
 	c.JSON(200, forms.Response{StatusCode: 200, Messages: "", Data: map[string]interface{}{"taskId": CreateTaskID()}})
 
+	// Begin concurrent to scan
 	ConLimit := make(chan int, form.Concurrent)
-
-	wg.Add(len(ports)*len(ips) +1)
+	// TODO:
+	wg.Add(len(ports)*len(ips))
 	for _, ip := range ips {
 		_, err = conn.Do("SADD",ip,"running")
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		// Create a taskId for-each
+		_, err = conn.Do("SET",ip.String() + "taskid",CreateTaskID())
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		for _, port := range ports {
 			ConLimit <- 1
 			go scanner.StartScanTask(ip, port, &wg,&ConLimit)
@@ -68,6 +76,23 @@ func RetResult() {
 	}
 }
 
+func GetSingleIpRes(c *gin.Context,ip string) {
+	pool := database.NewPool()
+	conn := pool.Get()
+	port,err := redis.Strings(conn.Do("SMEMBERS",ip))
+	if err != nil {
+		log.Fatal(err)
+	}
+	for k,v := range port {
+		if v == "running" {
+			port = append(port[:k], port[k+1:]...)
+			break
+		}
+	}
+
+	c.JSON(200, forms.Response{StatusCode: 200, Messages: port, Data: map[string]interface{}{}})
+}
+
 func GetResult(c *gin.Context) {
 	data := make(map[string]interface{})
 	status := make(map[string]bool)
@@ -82,10 +107,19 @@ func GetResult(c *gin.Context) {
 		log.Fatal(err)
 	}
 
+	for k,v := range ips {
+		if strings.Contains(v, "taskid") {
+			ips = append(ips[:k], ips[k+1:]...)
+		}
+	}
+
 	for _,ip := range ips {
+		var taskId string
+
 		port,err := redis.Strings(conn.Do("SMEMBERS",ip))
 		if err!= nil {
-			log.Fatal(err)
+			//log.Println(err)
+			continue
 		}
 
 		//delete value "running" and return
@@ -97,9 +131,25 @@ func GetResult(c *gin.Context) {
 			}
 			status[ip] = false
 		}
-		tmp := map[string]interface{}{"port":port,"status":status[ip]}
+		var long bool
+		if len(port) > 10 {
+			long = true
+		} else {
+			long = false
+		}
+
+		// Get taskID
+		isExist, err := redis.Bool(conn.Do("EXISTS",ip + "taskid"))
+		if isExist {
+			taskId,err = redis.String(conn.Do("GET",ip + "taskid"))
+			if err!= nil {
+				log.Fatal(err)
+			}
+		}
+
+		tmp := map[string]interface{}{"port":port,"status":status[ip],"long":long,"taskId": taskId}
 		data[ip] = tmp
 	}
 
-	c.JSON(200, forms.Response{StatusCode: 200, Messages: data, Data: map[string]interface{}{"taskId": CreateTaskID()}})
+	c.JSON(200, forms.Response{StatusCode: 200, Messages: data, Data: map[string]interface{}{}})
 }

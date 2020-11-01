@@ -1,0 +1,5 @@
+package scanner
+
+func CheckHost () {
+
+}

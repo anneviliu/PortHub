@@ -10,6 +10,12 @@ a:hover {
 }
 
 /* Custom default button */
+#btn {
+    margin: 0;padding: 0;
+    border: none;outline: none;
+    cursor: pointer;
+}
+
 .btn-secondary,
 .btn-secondary:hover,
 .btn-secondary:focus {
@@ -17,6 +23,12 @@ a:hover {
     text-shadow: none; /* Prevent inheritance from `body` */
     background-color: #fff;
     border: .05rem solid #fff;
+}
+
+.dropdown-custom {
+    border-radius: 5%;
+    min-width:100px;
+    background-color: rgb(39, 35, 35);
 }
 
 
@@ -28,6 +40,7 @@ html,
 body {
     height: 100%;
     background-color: #333;
+    font-family: 'Roboto Slab', serif;
 }
 
 body {
@@ -39,13 +52,13 @@ body {
 }
 
 .cover-container {
-    max-width: 42em;
+    max-width: 42rem;
+
 }
-
-
 /*
  * Header
  */
+
 .masthead {
     margin-bottom: 2rem;
 }
@@ -101,9 +114,9 @@ body {
     float: right;
 }
 
-.reslut-logo {
+.result-logo {
     text-align: center;
-    margin-bottom: 80px;
+    margin-bottom: 50px;
 }
 
 .ports {
@@ -111,7 +124,7 @@ body {
 }
 
 .card-cus {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 /*
