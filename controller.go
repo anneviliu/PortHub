@@ -32,6 +32,7 @@ func ScannerController(c *gin.Context) {
 
 	c.JSON(200, forms.Response{StatusCode: 200, Messages: "", Data: map[string]interface{}{"taskId": CreateTaskID()}})
 
+
 	// Begin concurrent to scan
 	ConLimit := make(chan int, form.Concurrent)
 	// TODO:
@@ -42,11 +43,19 @@ func ScannerController(c *gin.Context) {
 			log.Fatal(err)
 		}
 
-		// Create a taskId for-each
-		_, err = conn.Do("SET",ip.String() + "taskid",CreateTaskID())
-		if err != nil {
-			log.Fatal(err)
+		if !scanner.ICMPRun(ip.String()) {
+			_, err = conn.Do("SREM",ip,"running")
+			if err != nil {
+				log.Fatal(err)
+			}
+			continue
 		}
+
+		// Create a taskId for-each
+		//_, err = conn.Do("SET",ip.String() + "taskid",CreateTaskID())
+		//if err != nil {
+		//	log.Fatal(err)
+		//}
 
 		for _, port := range ports {
 			ConLimit <- 1
@@ -107,11 +116,11 @@ func GetResult(c *gin.Context) {
 		log.Fatal(err)
 	}
 
-	for k,v := range ips {
-		if strings.Contains(v, "taskid") {
-			ips = append(ips[:k], ips[k+1:]...)
-		}
-	}
+	//for k,v := range ips {
+	//	if strings.Contains(v, "taskid") {
+	//		ips = append(ips[:k], ips[k+1:]...)
+	//	}
+	//}
 
 	for _,ip := range ips {
 		var taskId string
@@ -139,13 +148,13 @@ func GetResult(c *gin.Context) {
 		}
 
 		// Get taskID
-		isExist, err := redis.Bool(conn.Do("EXISTS",ip + "taskid"))
-		if isExist {
-			taskId,err = redis.String(conn.Do("GET",ip + "taskid"))
-			if err!= nil {
-				log.Fatal(err)
-			}
-		}
+		//isExist, err := redis.Bool(conn.Do("EXISTS",ip + "taskid"))
+		//if isExist {
+		//	taskId,err = redis.String(conn.Do("GET",ip + "taskid"))
+		//	if err!= nil {
+		//		log.Fatal(err)
+		//	}
+		//}
 
 		tmp := map[string]interface{}{"port":port,"status":status[ip],"long":long,"taskId": taskId}
 		data[ip] = tmp
