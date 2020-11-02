@@ -21,7 +21,6 @@ func CreateTaskID() string {
 	return ids
 }
 
-// 解析ip 和 port的格式
 func ResolveIPPortFormat(form *forms.PortScanForm) ([]net.IP, []int, error) {
 	var ipList []net.IP
 	list, err := iprange.ParseList(form.Ips)

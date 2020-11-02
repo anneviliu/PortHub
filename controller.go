@@ -26,16 +26,17 @@ func ScannerController(c *gin.Context) {
 		c.JSON(400, forms.Response{StatusCode: 400, Messages: err.Error(), Data: nil})
 		return
 	}
+
 	var wg sync.WaitGroup
 	pool := database.NewPool()
 	conn := pool.Get()
 
 	c.JSON(200, forms.Response{StatusCode: 200, Messages: "", Data: map[string]interface{}{"taskId": CreateTaskID()}})
 
-
 	// Begin concurrent to scan
 	ConLimit := make(chan int, form.Concurrent)
-	// TODO:
+
+	// TODO: When start a task, gin need to close the connection immediately
 	wg.Add(len(ports)*len(ips))
 	for _, ip := range ips {
 		_, err = conn.Do("SADD",ip,"running")

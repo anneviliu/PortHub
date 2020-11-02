@@ -26,10 +26,14 @@ new Vue({
         },
 
     },
-    mounted () {
+    created () {
         this.getResult();
-        window.setInterval(() => {
-            setTimeout(this.getResult(),0)
-        }, 1000)
+        window.setInterval(async () => {
+            setTimeout(await this.getResult(),0)
+        }, 2000)
     }
+
+
+
+
 });

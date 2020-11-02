@@ -14,12 +14,6 @@ type Response struct {
 	Data       interface{} `json:"data"`
 }
 
-//type Result struct {
-//	StatusCode int `json:"statusCode"`
-//	Result []string `json:"result"`
-//
-//}
-
 type ScannerDb struct {
 	gorm.Model
 	Ip     string `gorm:"ip"`

@@ -86,7 +86,7 @@ func IcmpCheck(ip string) bool {
 }
 
 func ExecCommandPing(ip string,bsenv string) bool {
-	command := exec.Command(bsenv, "-c", "ping -c 1 -i 0.5 -t 4 -W 2 -w 5 "+ip+" >/dev/null && echo true || echo false")
+	command := exec.Command("bash", "-c", "ping -c 2 -i 1 -W 2 "+ip+" >/dev/null && echo true || echo false")
 	outinfo := bytes.Buffer{}
 	command.Stdout = &outinfo
 	err := command.Start()
@@ -97,7 +97,7 @@ func ExecCommandPing(ip string,bsenv string) bool {
 	if err = command.Wait();err!=nil{
 		return false
 	}else{
-		if(strings.Contains(outinfo.String(), "true")) {
+		if strings.Contains(outinfo.String(), "true") {
 			return true
 		}else {
 			return false
