@@ -1,13 +1,11 @@
 package main
 
 import (
-	"PortHub/database"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func main() {
-	database.InitDb()
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/static", "./static")

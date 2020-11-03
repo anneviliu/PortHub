@@ -16,7 +16,6 @@ func StartScanTask(ip net.IP, port int, wg *sync.WaitGroup,ConLimit *chan int) {
 		IP:   ip,
 		Port: port,
 	}
-
 	
 	conn, _ := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", tcpAddr.IP, tcpAddr.Port), time.Millisecond*time.Duration(500))
 	if conn != nil {

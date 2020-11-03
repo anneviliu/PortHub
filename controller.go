@@ -30,6 +30,7 @@ func ScannerController(c *gin.Context) {
 	var wg sync.WaitGroup
 	pool := database.NewPool()
 	conn := pool.Get()
+	defer conn.Close()
 
 	c.JSON(200, forms.Response{StatusCode: 200, Messages: "", Data: map[string]interface{}{"taskId": CreateTaskID()}})
 
@@ -76,6 +77,8 @@ func ScannerController(c *gin.Context) {
 func RetResult() {
 	pool := database.NewPool()
 	conn := pool.Get()
+	defer conn.Close()
+
 	var infoArr []string
 	for _, v := range scanner.Alive {
 		infoArr = strings.Split(strings.Trim(v, ":"), ":")
@@ -89,6 +92,8 @@ func RetResult() {
 func GetSingleIpRes(c *gin.Context,ip string) {
 	pool := database.NewPool()
 	conn := pool.Get()
+	defer conn.Close()
+
 	port,err := redis.Strings(conn.Do("SMEMBERS",ip))
 	if err != nil {
 		log.Fatal(err)
@@ -128,7 +133,6 @@ func GetResult(c *gin.Context) {
 
 		port,err := redis.Strings(conn.Do("SMEMBERS",ip))
 		if err!= nil {
-			//log.Println(err)
 			continue
 		}
 
@@ -141,6 +145,7 @@ func GetResult(c *gin.Context) {
 			}
 			status[ip] = false
 		}
+
 		var long bool
 		if len(port) > 10 {
 			long = true
